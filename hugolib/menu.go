@@ -35,6 +35,7 @@ type MenuEntry struct {
 	Weight     int
 	Parent     string
 	Children   Menu
+	NewTab     bool
 }
 
 // Menu is a collection of menu entries.
@@ -100,6 +101,8 @@ func (m *MenuEntry) marshallMap(ime map[string]interface{}) {
 			m.Identifier = cast.ToString(v)
 		case "parent":
 			m.Parent = cast.ToString(v)
+		case "newtab":
+			m.NewTab = cast.ToBool(v)
 		}
 	}
 }
