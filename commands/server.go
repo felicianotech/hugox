@@ -20,6 +20,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"os/exec"
 	"os/signal"
 	"path/filepath"
 	"regexp"
@@ -55,6 +56,7 @@ type serverCmd struct {
 	liveReloadPort    int
 	serverWatch       bool
 	noHTTPCache       bool
+	openInBrowser     bool
 
 	disableFastRender   bool
 	disableBrowserError bool
@@ -99,6 +101,7 @@ of a second, you will be able to save and see your changes nearly instantly.`,
 	cc.cmd.Flags().BoolVar(&cc.renderToDisk, "renderToDisk", false, "render to Destination path (default is render to memory & serve from there)")
 	cc.cmd.Flags().BoolVar(&cc.disableFastRender, "disableFastRender", false, "enables full re-renders on changes")
 	cc.cmd.Flags().BoolVar(&cc.disableBrowserError, "disableBrowserError", false, "do not show build errors in the browser")
+	cc.cmd.Flags().BoolVar(&cc.openInBrowser, "browser", false, "open server URL in default browser")
 
 	cc.cmd.Flags().String("memstats", "", "log memory usage to this file")
 	cc.cmd.Flags().String("meminterval", "100ms", "interval to poll memory usage (requires --memstats), valid time units are \"ns\", \"us\" (or \"µs\"), \"ms\", \"s\", \"m\", \"h\".")
@@ -448,6 +451,28 @@ func (c *commandeer) serve(s *serverCmd) error {
 				os.Exit(1)
 			}
 		}()
+
+		if s.openInBrowser {
+
+			url := "http:" + endpoint
+
+			switch runtime.GOOS {
+			case "linux":
+				err = exec.Command("xdg-open", url).Start()
+			case "drawin":
+				err = exec.Command("open", url).Start()
+			case "windows":
+				err = exec.Command("rundll32", "url.dll,FileProtocolHandler", url).Start()
+			default:
+				err = fmt.Errorf("Unsupported platform.")
+			}
+
+			if err != nil {
+				jww.FEEDBACK.Println("Opening in browser didn't work.")
+			} else {
+				jww.FEEDBACK.Println("Opening in browser.")
+			}
+		}
 	}
 
 	jww.FEEDBACK.Println("Press Ctrl+C to stop")
