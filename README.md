@@ -1,4 +1,4 @@
-# hugoX [![CircleCI Build Status](https://circleci.com/gh/felicianotech/hugox.svg?style=shield)](https://circleci.com/gh/felicianotech/hugox) [![Software License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://raw.githubusercontent.com/circleci/circleci-docs/master/LICENSE) [![Upstream](https://img.shields.io/badge/upstream-hugo-lightgrey.svg)](https://github.com/gohugoio/hugo)
+# hugoX [![CircleCI Build Status](https://circleci.com/gh/felicianotech/hugox.svg?style=shield)](https://circleci.com/gh/felicianotech/hugox) [![Software License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://raw.githubusercontent.com/felicianotech/hugox/master/LICENSE) [![Upstream](https://img.shields.io/badge/upstream-hugo-lightgrey.svg)](https://github.com/gohugoio/hugo)
 
 hugoX is a build of Hugo (the static site generator) with additional/experimental features.
 It stands for "Hugo eXtra".
@@ -6,14 +6,14 @@ It stands for "Hugo eXtra".
 hugoX isn't a hard fork of Hugo.
 Instead, it's what I'm calling a "parallel fork".
 Each release of Hugo will be incorporated back into hugoX.
-You can learn much more about Hugo and contribute that beaufitul from by visiting [the Hugo Readme](https://github.com/gohugoio/hugo/README.md).
+You can learn much more about Hugo and contribute to that beautiful project by visiting [the Hugo Readme](https://github.com/gohugoio/hugo/README.md).
 
 With hugoX, you'll always be able to do everything that you can do with Hugo, plus a little bit eXtra.
 
 
 ## Installation
 
-Hugo can be installed on the three major OSs as well as compiled from source.
+hugoX can be installed on the three major OSs as well as compiled from source.
 
 ### Linux
 
@@ -41,18 +41,50 @@ cd <to-where-you-store-repos>
 git clone github.com/felicianotech/hugox
 cd hugox
 git checkout <hugox-version>
-go install
+go build -o hugox ./...
 ```
 
 
 ## Usage
 
 hugoX can be used the same way you use Hugo.
-You can run `hugox help` to available commands and options.
+You can run `hugox help` to view available commands and options.
 See [Extra Features](#extra-features) below to see what's been add specifically to hugoX.
 
 
 ## eXtra Features
+
+### Open In Browser
+
+```
+hugox serve --browser
+```
+
+Automatically open the local development server in the default browser upon running the `serve` command.
+
+### Open in New Tab Support for Hugo Menus
+
+```
+[[menu.main]]
+	name	= "GitHub"
+	url		= "https://github.com/FelicianoTech"
+	newTab  = true
+```
+
+A new parameter for a Hugo Menu item is provided, newTab.
+You can set this to true and then check for it when you render the menu in a template.
+Here's an example:
+
+```html
+		<ul class="menu h main">
+		{{ $currentNode := . }}
+		{{ range .Site.Menus.main }}
+			<li class="{{ if or ($currentNode.IsMenuCurrent "main" .) ($currentNode.HasMenuCurrent "main" .) }}active{{ end }}">
+				<a href="{{ .URL }}" {{ if .NewTab }}target="_blank"{{ end }}>{{ .Name }}</a>
+			</li>
+		{{ end }}
+		</ul>
+```
 
 
 ## License & Copyright
